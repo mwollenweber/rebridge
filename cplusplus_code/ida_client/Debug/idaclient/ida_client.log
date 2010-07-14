@@ -1,0 +1,52 @@
+﻿Build started 6/25/2010 1:44:21 AM.
+     1>Project "Z:\projects\idabridge\cplusplus_code\ida_client\ida_client.vcxproj" on node 3 (build target(s)).
+     1>InitializeBuildStatus:
+         Creating "Debug\idaclient\ida_client.unsuccessfulbuild" because "AlwaysCreate" was specified.
+       ClCompile:
+         E:\Microsoft Visual Studio 10.0\VC\bin\CL.exe /c /I"C:\Program Files\IDA\idasdk56\include" /ZI /nologo /W3 /WX- /Od /Oy- /D IDA_CLIENT /D USE_DANGEROUS_FUNCTIONS /D __NT__ /D __IDP__ /D _WINDLL /D _MBCS /D _CRT_SECURE_NO_WARNINGS /D _DEBUG /D _WINDOWS /D _USRDLL /D IDA_CLIENT_EXPORTS /D _WINDLL /D _MBCS /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\idaclient\\" /Fd"Debug\idaclient\vc100.pdb" /Gd /TP /analyze- /errorReport:prompt ..\sources\buffer.cpp ..\sources\cmd_translation.cpp ..\sources\dlistener_ida.cpp ..\sources\dlistener_net.cpp ..\sources\idanet.cpp
+         idanet.cpp
+         dlistener_net.cpp
+     1>z:\projects\idabridge\cplusplus_code\sources\idanet.hpp(24): warning C4005: 'WINVER' : macro redefinition
+                 c:\program files\microsoft sdks\windows\v7.0a\include\sdkddkver.h(212) : see previous definition of 'WINVER'
+         dlistener_ida.cpp
+         cmd_translation.cpp
+         buffer.cpp
+         Generating Code...
+       ResourceCompile:
+         C:\Program Files\Microsoft SDKs\Windows\v7.0A\bin\rc.exe /l"0x0409" /nologo /fo"Debug\idaclient\ida_client.res" ida_client.rc 
+       ManifestResourceCompile:
+         C:\Program Files\Microsoft SDKs\Windows\v7.0A\bin\rc.exe /nologo /fo"Debug\idaclient\ida_client.plw.embed.manifest.res" Debug\idaclient\ida_client_manifest.rc 
+     1>C:\Program Files\MSBuild\Microsoft.Cpp\v4.0\Microsoft.CppBuild.targets(990,5): warning MSB8012: TargetPath(Z:\projects\idabridge\cplusplus_code\Debug\ida_client.plw) does not match the Linker's OutputFile property value (C:\Program Files\IDA\plugins\idabridge.plw). This may cause your project to build incorrectly. To correct this, please make sure that $(OutDir), $(TargetName) and $(TargetExt) property values match the value specified in %(Link.OutputFile).
+     1>C:\Program Files\MSBuild\Microsoft.Cpp\v4.0\Microsoft.CppBuild.targets(992,5): warning MSB8012: TargetName(ida_client) does not match the Linker's OutputFile property value (idabridge). This may cause your project to build incorrectly. To correct this, please make sure that $(OutDir), $(TargetName) and $(TargetExt) property values match the value specified in %(Link.OutputFile).
+       Link:
+         E:\Microsoft Visual Studio 10.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Program Files\IDA\plugins\idabridge.plw" /INCREMENTAL /NOLOGO /LIBPATH:"C:\Program Files\IDA\idasdk56\lib\vc.w32" ida.lib ws2_32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /ManifestFile:"Debug\idaclient\ida_client.plw.intermediate.manifest" /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /DEBUG /PDB:"Z:\projects\idabridge\cplusplus_code\Debug\ida_client.pdb" /SUBSYSTEM:WINDOWS /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"Z:\projects\idabridge\cplusplus_code\Debug\ida_client.lib" /MACHINE:X86 /DLL Debug\idaclient\ida_client.res
+         Debug\idaclient\ida_client.plw.embed.manifest.res
+         Debug\idaclient\buffer.obj
+         Debug\idaclient\cmd_translation.obj
+         Debug\idaclient\dlistener_ida.obj
+         Debug\idaclient\dlistener_net.obj
+         Debug\idaclient\idanet.obj
+         Z:\projects\idabridge\cplusplus_code\Debug\windbg_server.lib
+            Creating library Z:\projects\idabridge\cplusplus_code\Debug\ida_client.lib and object Z:\projects\idabridge\cplusplus_code\Debug\ida_client.exp
+       Manifest:
+         C:\Program Files\Microsoft SDKs\Windows\v7.0A\bin\mt.exe /nologo /verbose /out:"Debug\idaclient\ida_client.plw.embed.manifest" /manifest Debug\idaclient\ida_client.plw.intermediate.manifest
+         C:\Program Files\Microsoft SDKs\Windows\v7.0A\bin\rc.exe /nologo /fo"Debug\idaclient\ida_client.plw.embed.manifest.res" Debug\idaclient\ida_client_manifest.rc 
+       LinkEmbedManifest:
+         E:\Microsoft Visual Studio 10.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Program Files\IDA\plugins\idabridge.plw" /INCREMENTAL /NOLOGO /LIBPATH:"C:\Program Files\IDA\idasdk56\lib\vc.w32" ida.lib ws2_32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /ManifestFile:"Debug\idaclient\ida_client.plw.intermediate.manifest" /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /DEBUG /PDB:"Z:\projects\idabridge\cplusplus_code\Debug\ida_client.pdb" /SUBSYSTEM:WINDOWS /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"Z:\projects\idabridge\cplusplus_code\Debug\ida_client.lib" /MACHINE:X86 /DLL Debug\idaclient\ida_client.res
+         Debug\idaclient\ida_client.plw.embed.manifest.res
+         Debug\idaclient\buffer.obj
+         Debug\idaclient\cmd_translation.obj
+         Debug\idaclient\dlistener_ida.obj
+         Debug\idaclient\dlistener_net.obj
+         Debug\idaclient\idanet.obj
+         Z:\projects\idabridge\cplusplus_code\Debug\windbg_server.lib
+            Creating library Z:\projects\idabridge\cplusplus_code\Debug\ida_client.lib and object Z:\projects\idabridge\cplusplus_code\Debug\ida_client.exp
+         ida_client.vcxproj -> Z:\projects\idabridge\cplusplus_code\Debug\ida_client.plw
+       FinalizeBuildStatus:
+         Deleting file "Debug\idaclient\ida_client.unsuccessfulbuild".
+         Touching "Debug\idaclient\ida_client.lastbuildstate".
+     1>Done Building Project "Z:\projects\idabridge\cplusplus_code\ida_client\ida_client.vcxproj" (build target(s)).
+
+Build succeeded.
+
+Time Elapsed 00:00:14.64

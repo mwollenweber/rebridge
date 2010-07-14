@@ -1,0 +1,76 @@
+﻿Build started 6/22/2010 3:01:36 PM.
+     1>Project "C:\Documents and Settings\mjw\My Documents\idabridge\cplusplus_code\windbg_server\windbg_server.vcxproj" on node 2 (build target(s)).
+     1>InitializeBuildStatus:
+         Creating "X64\Debug\windbg_server.unsuccessfulbuild" because "AlwaysCreate" was specified.
+       ClCompile:
+         E:\Microsoft Visual Studio 10.0\VC\bin\x86_amd64\CL.exe /c /ZI /nologo /W3 /WX- /Od /D WIN32 /D _DEBUG /D _WINDOWS /D _USRDLL /D WINDBG_SERVER_EXPORTS /D _WINDLL /D _MBCS /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"X64\Debug\\" /Fd"X64\Debug\vc100.pdb" /Gd /TP /errorReport:prompt ..\sources\buffer.cpp ..\sources\cmd_translation.cpp ..\sources\dlistener.cpp ..\sources\dlistener_eventcb.cpp ..\sources\dlistener_net.cpp ..\sources\dlistener_wdbg.cpp ..\sources\dlistener_windbg.cpp
+     1>cl : Command line warning D9038: /ZI is not supported on this platform; enabling /Zi instead
+     1>cl : Command line warning D9007: '/Gm' requires '/Zi'; option ignored
+         buffer.cpp
+     1>..\sources\buffer.cpp(189): warning C4267: 'argument' : conversion from 'size_t' to 'int', possible loss of data
+     1>..\sources\buffer.cpp(190): warning C4267: 'argument' : conversion from 'size_t' to 'unsigned int', possible loss of data
+     1>..\sources\buffer.cpp(197): warning C4267: 'initializing' : conversion from 'size_t' to 'unsigned short', possible loss of data
+         cmd_translation.cpp
+     1>..\sources\cmd_translation.cpp(154): warning C4267: 'initializing' : conversion from 'size_t' to 'unsigned int', possible loss of data
+     1>..\sources\cmd_translation.cpp(274): warning C4267: 'initializing' : conversion from 'size_t' to 'unsigned int', possible loss of data
+         dlistener.cpp
+     1>..\sources\dlistener.cpp(97): warning C4101: 'Status' : unreferenced local variable
+         dlistener_eventcb.cpp
+         dlistener_net.cpp
+     1>..\sources\dlistener_net.cpp(80): warning C4267: 'argument' : conversion from 'size_t' to 'int', possible loss of data
+     1>..\sources\dlistener_net.cpp(81): warning C4267: 'argument' : conversion from 'size_t' to 'unsigned int', possible loss of data
+     1>..\sources\dlistener_net.cpp(171): warning C4267: 'argument' : conversion from 'size_t' to 'int', possible loss of data
+     1>..\sources\dlistener_net.cpp(172): warning C4267: 'argument' : conversion from 'size_t' to 'unsigned int', possible loss of data
+     1>..\sources\dlistener_net.cpp(186): warning C4267: 'initializing' : conversion from 'size_t' to 'unsigned int', possible loss of data
+     1>..\sources\dlistener_net.cpp(190): warning C4267: 'argument' : conversion from 'size_t' to 'int', possible loss of data
+     1>..\sources\dlistener_net.cpp(191): warning C4267: 'argument' : conversion from 'size_t' to 'unsigned int', possible loss of data
+         dlistener_wdbg.cpp
+     1>..\sources\dlistener_wdbg.cpp(69): warning C4101: 'Status' : unreferenced local variable
+     1>..\sources\dlistener_wdbg.cpp(134): warning C4309: 'return' : truncation of constant value
+     1>..\sources\dlistener_wdbg.cpp(156): warning C4244: 'return' : conversion from 'SOCKET' to 'BOOL', possible loss of data
+     1>..\sources\dlistener_wdbg.cpp(409): warning C4101: 'hr' : unreferenced local variable
+     1>..\sources\dlistener_wdbg.cpp(712): warning C4244: 'initializing' : conversion from '__int64' to 'ULONG', possible loss of data
+     1>..\sources\dlistener_wdbg.cpp(725): warning C4244: 'initializing' : conversion from 'LONG64' to 'ULONG', possible loss of data
+     1>..\sources\dlistener_wdbg.cpp(744): warning C4267: 'argument' : conversion from 'size_t' to 'unsigned int', possible loss of data
+         dlistener_windbg.cpp
+     1>..\sources\dlistener_windbg.cpp(149): warning C4101: 'value' : unreferenced local variable
+     1>..\sources\dlistener_windbg.cpp(177): warning C4101: 'peb_off' : unreferenced local variable
+     1>..\sources\dlistener_windbg.cpp(332): warning C4267: 'initializing' : conversion from 'size_t' to 'ULONG', possible loss of data
+     1>..\sources\dlistener_windbg.cpp(349): warning C4244: '=' : conversion from 'ULONG64' to 'ULONG', possible loss of data
+         Generating Code...
+       ManifestResourceCompile:
+         C:\Program Files\Microsoft SDKs\Windows\v7.0A\bin\rc.exe /nologo /fo"X64\Debug\dlistener.dll.embed.manifest.res" X64\Debug\dlistener_manifest.rc 
+     1>C:\Program Files\MSBuild\Microsoft.Cpp\v4.0\Microsoft.CppBuild.targets(990,5): warning MSB8012: TargetPath(C:\Documents and Settings\mjw\My Documents\idabridge\cplusplus_code\X64\Debug\dlistener.dll) does not match the Linker's OutputFile property value (C:\Program Files\Debugging Tools for Windows (x64)\winext\dlistener.dll). This may cause your project to build incorrectly. To correct this, please make sure that $(OutDir), $(TargetName) and $(TargetExt) property values match the value specified in %(Link.OutputFile).
+       Link:
+         E:\Microsoft Visual Studio 10.0\VC\bin\x86_amd64\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Program Files\Debugging Tools for Windows (x64)\winext\dlistener.dll" /INCREMENTAL /NOLOGO /LIBPATH:..\..\..\winddk_7700\Debuggers\sdk\lib\amd64 dbgeng.lib ws2_32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /ManifestFile:"X64\Debug\dlistener.dll.intermediate.manifest" /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /DEBUG /PDB:"C:\Documents and Settings\mjw\My Documents\idabridge\cplusplus_code\X64\Debug\dlistener.pdb" /SUBSYSTEM:WINDOWS /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\Documents and Settings\mjw\My Documents\idabridge\cplusplus_code\X64\Debug\dlistener.lib" /MACHINE:X64 /DLL X64\Debug\dlistener.dll.embed.manifest.res
+         X64\Debug\buffer.obj
+         X64\Debug\cmd_translation.obj
+         X64\Debug\dlistener.obj
+         X64\Debug\dlistener_eventcb.obj
+         X64\Debug\dlistener_net.obj
+         X64\Debug\dlistener_wdbg.obj
+         X64\Debug\dlistener_windbg.obj
+            Creating library C:\Documents and Settings\mjw\My Documents\idabridge\cplusplus_code\X64\Debug\dlistener.lib and object C:\Documents and Settings\mjw\My Documents\idabridge\cplusplus_code\X64\Debug\dlistener.exp
+         windbg_server.vcxproj -> C:\Documents and Settings\mjw\My Documents\idabridge\cplusplus_code\X64\Debug\dlistener.dll
+       Manifest:
+         C:\Program Files\Microsoft SDKs\Windows\v7.0A\bin\mt.exe /nologo /verbose /out:"X64\Debug\dlistener.dll.embed.manifest" /manifest X64\Debug\dlistener.dll.intermediate.manifest
+         C:\Program Files\Microsoft SDKs\Windows\v7.0A\bin\rc.exe /nologo /fo"X64\Debug\dlistener.dll.embed.manifest.res" X64\Debug\dlistener_manifest.rc 
+       LinkEmbedManifest:
+         E:\Microsoft Visual Studio 10.0\VC\bin\x86_amd64\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Program Files\Debugging Tools for Windows (x64)\winext\dlistener.dll" /INCREMENTAL /NOLOGO /LIBPATH:..\..\..\winddk_7700\Debuggers\sdk\lib\amd64 dbgeng.lib ws2_32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /ManifestFile:"X64\Debug\dlistener.dll.intermediate.manifest" /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /DEBUG /PDB:"C:\Documents and Settings\mjw\My Documents\idabridge\cplusplus_code\X64\Debug\dlistener.pdb" /SUBSYSTEM:WINDOWS /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\Documents and Settings\mjw\My Documents\idabridge\cplusplus_code\X64\Debug\dlistener.lib" /MACHINE:X64 /DLL X64\Debug\dlistener.dll.embed.manifest.res
+         X64\Debug\buffer.obj
+         X64\Debug\cmd_translation.obj
+         X64\Debug\dlistener.obj
+         X64\Debug\dlistener_eventcb.obj
+         X64\Debug\dlistener_net.obj
+         X64\Debug\dlistener_wdbg.obj
+         X64\Debug\dlistener_windbg.obj
+            Creating library C:\Documents and Settings\mjw\My Documents\idabridge\cplusplus_code\X64\Debug\dlistener.lib and object C:\Documents and Settings\mjw\My Documents\idabridge\cplusplus_code\X64\Debug\dlistener.exp
+         windbg_server.vcxproj -> C:\Documents and Settings\mjw\My Documents\idabridge\cplusplus_code\X64\Debug\dlistener.dll
+       FinalizeBuildStatus:
+         Deleting file "X64\Debug\windbg_server.unsuccessfulbuild".
+         Touching "X64\Debug\windbg_server.lastbuildstate".
+     1>Done Building Project "C:\Documents and Settings\mjw\My Documents\idabridge\cplusplus_code\windbg_server\windbg_server.vcxproj" (build target(s)).
+
+Build succeeded.
+
+Time Elapsed 00:00:12.42

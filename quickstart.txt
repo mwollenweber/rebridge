@@ -1,0 +1,41 @@
+Commands and IDA specific functionality are contained in dlistener_ida files.
+Commands and WinDbg specific functionality are contained in
+dlistener_wdbg files.
+
+idanet sets up the asynchronous server for IDA.
+
+a Buffer is the application message.  A message is either a CMD_REQ
+and CMD_RES, and depending on the command, the stuff does certain
+things.  A message contains the command "getbps",
+"setbps","idapython", and it may be followed by arguments e.g.
+"idapython" "MakeName" "0x45550,'fool'".
+
+The server code and send recv all work, and have not changed.
+Commands have all changed, and they are executed using a command
+handler.  There are two types of handlers, a CLI_HANDLER and
+NET_HANDLER.  These are typedef vectors of CLI_FN or NET_FN.  NET_FN
+and CLI_FN are the functions exectuted by the command handler
+depending.  a NET_FN is a function that takes a Buffer & as an
+argument and a CLI_FN is a function that takes string & as arguments.
+
+The command Handler, aptly named APP_HANDLER has three differnt
+command handlers one for CMD_RES messages, CMD_REQ messages, and then
+CLI stuff.  The handlers are resolved by their name.  See
+execute_command_handler for all the details.
+
+bool recv_net_command(Buffer &b) is used to answer the commands from
+the network for both windbg and ida
+bool idaapi dlistener_command_handler(const char *line) in
+dlistener_ida handles the command line stuff for IDA
+HRESULT dlistener_handler(PDEBUG_CLIENT4 Client, PCSTR args) will
+handle the command line stuff in windbg.
+
+Cmd_translation.cpp/h has all the functions used to translate 
+command strings ---> handler functions and resolve commands that may 
+be aliases.  
+
+
+Code is a mess, but everything is flushed out to the point where future
+development can be made into a more formal OO solution.
+
+hopefully this will be a good start

@@ -1,0 +1,98 @@
+#!/usr/bin/env python
+
+import os
+import sys
+import getopt
+import traceback
+import threading
+
+import vdb
+import vtrace
+import cobra
+
+def usage():
+    print "Usage: vdb [options]"
+    print "\t-S\t\tServer mode (start a vtrace server)"
+    print "\t-v\t\tVerbose mode"
+    print "\t-G\t\tDo the GUI thang..."
+    print "\t-R <host>\tConnect to remote vdb server"
+    print "\t-p <pid> \tAttach to the given pid"
+    print "\t-s <file>\tLoad process snapshot from file"
+    sys.exit(0)
+
+if __name__ == "__main__":
+
+    pid = None
+    cmd = None
+    snapshot = None
+
+    try:
+        opts,args = getopt.getopt(sys.argv[1:], "R:vGSp:s:c:")
+    except:
+        usage()
+
+    do_gui = False
+
+    for opt,optarg in opts:
+        if "R" in opt:
+            vtrace.remote = optarg
+
+        elif opt == "-c":
+            cmd = optarg
+
+        elif opt == "-G":
+            do_gui = True
+
+        elif opt == "-s":
+            snapshot = optarg
+
+        elif opt == "-S":
+            vtrace.startVtraceServer()
+
+        elif opt == "-p":
+            pid = int(optarg)
+
+        elif opt == "-v":
+            vtrace.verbose = True
+            cobra.verbose = True
+
+    if snapshot != None:
+        trace = vtrace.TraceSnapshot(snapshot)
+    else:
+        trace = vtrace.getTrace()
+
+    db = vdb.Vdb(trace)
+    #db = Vdb(trace)
+    if do_gui:
+        import vwidget.main as vw_main
+        import vdb.gui
+        vw_main.mainthread()
+        vgui = vdb.gui.VdbGui(db)
+
+    if pid != None:
+        trace.attach(pid)
+
+    elif cmd != None:
+        trace.execute(cmd)
+
+    if do_gui:
+
+        vw_main.main()
+
+    else:
+
+        while not db.shutdown.isSet():
+            try:
+
+                db.cmdloop()
+
+            except KeyboardInterrupt:
+                if db.trace.isRunning():
+                    db.trace.sendBreak()
+
+            except SystemExit:
+                break
+
+            except:
+                traceback.print_exc()
+

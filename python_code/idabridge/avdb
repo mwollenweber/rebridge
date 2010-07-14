@@ -1,0 +1,29 @@
+#!/usr/bin/env python
+
+import os
+import sys
+import getopt
+import traceback
+import threading
+
+sys.path.append("vdb/")
+import vtrace
+import cobra
+from vdbbridge import  Vdbbridge as Vdb
+
+if __name__ == "__main__":
+	trace = vtrace.getTrace()
+	db = Vdb(trace)
+	while not db.shutdown.isSet():
+		try:
+			db.cmdloop()
+		except KeyboardInterrupt:
+			if db.trace.isRunning():
+				db.trace.sendBreak()
+
+		except SystemExit:
+			break
+
+		except:
+			traceback.print_exc()
+
