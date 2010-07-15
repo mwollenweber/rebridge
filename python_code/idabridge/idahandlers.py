@@ -203,8 +203,9 @@ class breakc(Handler):
     
     def req(self, buffer, **kargs):
         addr = buffer.read_string()
-        addr = IdabridgeUtils.convert_str_to_numval(addr)
-        #print "Handled a break command: %s"%str(addr)
+        kargs['regs'] = self.parent.getRegs()
+        addr = IdabridgeUtils.guess_addr_by_name_expression(addr, **kargs)
+        print "Handled a break command: %s"%str(addr)
         if addr:
             #print "Handled a break command: %s"%str(addr)
             return self.parent.setCurrentAddress(addr)
@@ -319,7 +320,7 @@ class writemem(Handler):
     
 class readmem(Handler):
     def __post_init__(self):
-        self.aliases = ['readmem','read_mem']
+        self.aliases = ['readmem','read_mem','rem']
         #print self.aliases
         self.parent.add_aliases(self.cmd_name, self.aliases)
     
@@ -331,6 +332,7 @@ class readmem(Handler):
         addr = string.strip().split()[0]
         if len(string.strip().split()) > 1 and cnt.isdigit():
             cnt = string.strip().split()[1]
+        kargs = {'regs':self.parent.platformGetRegisters()}
         addr_val = IdabridgeUtils.guess_addr_by_name_expression(addr, **kargs)
         buffer = self.create_base_buffer(CMD_REQ)
         
@@ -344,12 +346,15 @@ class readmem(Handler):
     def req(self, buffer):
         addr = buffer.read_string()
         cnt = buffer.read_string()
-        kargs = {'regs':self.parent.platformGetRegisters()}
+        
         result = "error bad values"
         buffer = self.create_base_buffer(CMD_RES)
+        
+        kargs = {'regs':self.parent.platformGetRegisters()}
         addr_val = IdabridgeUtils.guess_addr_by_name_expression(addr.strip(), **kargs)
         
-        if addr is None or addr_val > idc.MaxEA() or addr_val < idc.MinEA():
+        if addr_val is None or addr_val > idc.MaxEA() or addr_val < idc.MinEA():
+            
             buffer.write_string(addr)
             buffer.write_string(result)
             return self.return_data(buffer)
@@ -377,6 +382,7 @@ class readmem(Handler):
             return self.return_data(False)
         if not t is None:
             kargs['time'] = t
+        kargs['regs'] = self.parent.platformGetRegisters()
         addr_val = IdabridgeUtils.guess_addr_by_name_expression(string.strip(), **kargs)
         self.platformAddMemoryBlock(addr_val, data, **kargs)
         return self.return_data(True)
@@ -395,12 +401,11 @@ class getbps(Handler):
         return self.return_data(buffer)
         
     def req(self, buffer, **kargs):
-        bp_str = ",".join(self.parent.platformAddBreakpointByAddr())
-        buffer = self.create_base_buffer(CMD_REQ, "setbps")
-        buffer.write_string(bp_str)
-        return self.return_data(buffer)
+        bp_str = ",".join(self.parent.platformGetBreakpoints())
+        buf = self.create_base_buffer(CMD_REQ, "setbps")
+        buf.write_string(bp_str)
+        return self.return_data(buf)
             
-
 # TODO: Not tested.       
 class setbps(Handler):
     
@@ -416,6 +421,7 @@ class setbps(Handler):
         return self.return_data(buffer)
         
     def req(self, buffer, **kargs):
+        idc.Message("Handling a setbps REQ.\n")
         breakpoints = buffer.read_string()
         bp_list = [bp for bp in breakpoints.split(',')]
         self.parent.platformClearBreakpoints()

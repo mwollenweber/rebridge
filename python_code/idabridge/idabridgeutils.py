@@ -87,7 +87,7 @@ class IdabridgeUtils:
     
     
     @classmethod
-    def guess_name(cls, addr):
+    def guess_name(cls, addr, **kargs):
         '''
         trys to get the named value by function and offset
         other wise return %segment%:addr

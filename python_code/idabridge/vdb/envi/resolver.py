@@ -130,14 +130,15 @@ class SymbolResolver:
         if sym is None:
             return None
         
-        if sym.addr > va:
+        
+        if va != 0 and sym.addr > va:
             name = sym.name +"-0x%0x"%(sym.addr - va)
-        elif sym.add < va:
+        elif va != 0 and sym.add < va:
             name = sym.name +"+0x%0x"%(va - sym.addr )
         return name
     
     def getSymNameDeltaByAddr(self, sym_va, va=None):
-        sym = self.getSymByAddr(sym_addr,exact=False)
+        sym = self.getSymByAddr(sym_va,exact=False)
         if sym is None:
             return "Unknown"
         name = ""
@@ -145,7 +146,7 @@ class SymbolResolver:
             return self.getSymNameDeltaByName(sym.name, va)
         name = self.getSymNameDeltaByName(sym.name, va)
         
-        if va is None:
+        if va is None or va == 0:
             return name
         
         if sym.addr  > va :

@@ -53,7 +53,7 @@ class Breakpoint:
             name = name + "ida: %s "%(self.idaname)
         if self.vdbname != "":
             name = name + "vdb: %s "%(self.vdbname)
-        return name+"0x%.8x" % self.address
+        return name+"Addr: 0x%.8x" % self.address
 
     def __repr__(self):
         if self.address == None:

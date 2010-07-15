@@ -7,6 +7,23 @@ CMD_RSP = 1
 CMD_CLI = 2
 CMD_EVT = 3
 
+BADADDR = 0xFFFFFFFF
+
+
+    
+class MemoryBlock(object):
+    def __init__(self, addr, **kargs):
+        object.__init__(self)
+        self.time = kargs.get("time", time())
+        self.addr = addr
+        self.data = kargs.get("data","")
+        self.name = kargs.get("name","")
+        self.appname = kargs.get("appname","")
+    
+    def __str__(self):
+        return "%s:%s %s"%(self.addr, self.name, repr(self.data))
+    
+
 class EventThread(threading.Thread):
     def __init__(self, parent, cmd, *args, **kargs):
         threading.Thread.__init__(self)
@@ -102,7 +119,7 @@ class Handler:
             cmd_name = self.cmd_name
         buffer = Buffer()
         buffer.write_int(cmd_type)
-        buffer.write_string(self.cmd_name)
+        buffer.write_string(cmd_name)
         return buffer
 
     def handle_cli(self, args, **kargs):

@@ -8,6 +8,7 @@ from vdbhandlers import *
 from idapython_aliases import *
 import envi.cli as e_cli
 import PE
+from vdbbridgeutils import *
 
 sys.path.append("vdb/")
 import vdb
@@ -22,6 +23,17 @@ def init_vdbbridge_cmds(vdbbridge):
     pycmd(**vdbbridge_vals)
     resume(**vdbbridge_vals)
     rabp(**vdbbridge_vals)
+    
+    # these appear to work
+    setbps(**vdbbridge_vals)
+    getbps(**vdbbridge_vals)
+    setregs(**vdbbridge_vals)
+    getregs(**vdbbridge_vals)
+    
+    # need to test these
+    #writemem(**vdbbridge_vals)
+    #readmem(**vdbbridge_vals)
+
 
 
 class Vdbbridge(vdb.Vdb, idacomms.IDARS):
@@ -120,21 +132,29 @@ class Vdbbridge(vdb.Vdb, idacomms.IDARS):
         self.pycmds[alias] = name
         
     
-    def platformGetRegisters(self, id=0):
-        if id > 0:
+    def platformGetRegisters(self, id=None):
+        if not id is None:
             return self.reg_history[id]
         return self.regs
     
+    def platformUpdateRegisters(self, **kargs):
+        regs = kargs.get('regs',None)
+        if regs is None:
+            regs = self.trace.getRegisters()
+            
+        self.regs = regs
+        for k,v in regs.items():
+            self.regs[k] = v
+
+    
     def platformSetRegisters(self, regs):
         self.regs = regs
-        self.reg_history.insert(0, regs)
         for regname,val in self.regs.items():
             self.trace.setRegisterByName(regname, val)
         
 
     def platformSaveRegisters(self):
-        regs = self.trace.getRegisters()
-        self.reg_history.insert(0, regs)
+        self.reg_history.insert(0, self.regs)
     
     def platformAddBreakpoint(self, bp, **kargs):
         # at the moment i am not going to play the bp game
@@ -150,16 +170,19 @@ class Vdbbridge(vdb.Vdb, idacomms.IDARS):
         # should make this more robust
         # support code and active, condition etc.
         bp_strs = []
-        for bp_id in self.trace.getBreakpoints():
+        for bp in self.trace.getBreakpoints():
             try:
-                bp = self.trace.getBreakpoint(bp_id)
-                addr = bp.addr
+                addr = bp.getAddress()
                 if addr is None:
-                    addr = self.trace.bp(bp_id)
-                bp_str = "0x%08x:%s"%(addr, bp.idaname)
+                    print "Bp had no addr :(\n"
+                    addr = bp.resolveAddress(self.trace)
+                    if addr is None:
+                        print "Bp had no addr and it could not be resolved\n"
+                        continue
+                bp_str = "0x%08x:%s"%(addr,"")# bp.idaname)
                 bp_strs.append(bp_str)
             except:
-                self.platformPrintResult("Ooops! breakpoint exception occurred\n")
+                self.platformPrintResult("Ooops! breakpoint exception occurred: %s\n"%(str(sys.exc_info()[0])))
         return bp_strs
         
     def platformClearBreakpoints(self):
@@ -257,7 +280,7 @@ class Vdbbridge(vdb.Vdb, idacomms.IDARS):
             cmd_name = "pycmd"
             print "CMD in (%s), CMD passed to pycmd: %s"%(str(is_pycmd), mydata)
             
-        #print "Final cmd_name: %s"%(cmd_name)
+        print "Final cmd_name: %s cmd_type: %d"%(cmd_name, cmd_type)
         handler = self.handlers[cmd_name]
         return handler.handle(cmd_type, data, **kargs)
     
@@ -278,7 +301,7 @@ class Vdbbridge(vdb.Vdb, idacomms.IDARS):
         if name is None or\
             not trace.hasMeta('LibraryBases') or\
             not name in trace.getMeta('LibraryBases'):
-            return 0xFFFFFFFF
+            return "0xFFFFFFFF"
         baseAddr = trace.getMeta('LibraryBases')[name]
         mem = PE.MemObjFile(trace, baseAddr)
         pobj = PE.PE(mem, inmem=True)
@@ -386,3 +409,22 @@ class Vdbbridge(vdb.Vdb, idacomms.IDARS):
     def check_pending_evt_queue(self, evt):
         return len(self.remote_cmd_queue) and evt == self.remote_cmd_queue[0][1]
     
+    def platformAddMemoryBlock(self, addr, data, id=0, **kargs):
+        kargs['trace'] = self.trace
+        addr_val = VdbbridgeUtils.guess_addr_val(addr)
+        appname = VdbbridgeUtils.guess_addr_by_name_expression(addr_val, **kargs)
+        
+        mb = MemoryBlock(addr_val, data=data, regs=self.regs, **kargs)
+        self.memory_blocks.insert(id, mb)
+        
+    def platformRemoveMemoryBlock(self, id):
+        if id > len(self.memory_blocks):
+            return None
+        mb = self.memory_blocks[id]
+        self.pop(id)
+        return mb
+    
+    def platformGetMemoryBlock(self, id):
+        if id > len(self.memory_blocks):
+            return None
+        return self.memory_blocks[id]

@@ -59,10 +59,11 @@ class MemoryBlock(object):
         self.time = kargs.get("time", time())
         self.addr = addr
         self.data = kargs.get("data","")
-        self.idaname = IdabridgeUtils.guess_addr_by_name_expression(string.strip(), **kargs)
+        self.name = kargs.get("name","")
+        self.appname = kargs.get("appname","")
     
     def __str__(self):
-        return "%s:%s %s"%(self.addr, self.idaname, repr(self.data))
+        return "%s:%s %s"%(self.addr, self.name, repr(self.data))
 
 class Registers(dict):
     def __init__(self, **kargs):
@@ -78,10 +79,10 @@ class Idabridge:
         self.reg_history = []
         self.regs = {}
         #self.x86reg_names = ["EAX", "EBX", "ECX", "EDX", "ESP", "EBP", "EDI", "ESI"]
-        self.current_address = "0x0"
-        self.previous_address = self.current_address 
-        self.current_address_val = 0
-        self.previous_address_val = self.current_address_val
+        self.current_address_val = "0x0"
+        self.previous_address_val = self.current_address_val 
+        self.current_address_str = 0
+        self.previous_address_str = self.current_address_str
         self.memory_blocks = []
     
     def getRegs(self):
@@ -95,35 +96,42 @@ class Idabridge:
             idc.SetColor(self.previous_address_val, idc.CIC_ITEM, 0xffffff)
         except:
             pass
+        self.previous_address_str = self.current_address_str
         self.previous_address_val = self.current_address_val
-        self.previous_address = self.current_address
         try:
-            idc.SetColor(self.previous_address, idc.CIC_ITEM, 0xa0a0ff)
+            idc.SetColor(self.previous_address_val, idc.CIC_ITEM, 0xa0a0ff)
         except:
             pass
         
     def setCurrentAddress(self, addr):
         self.setPreviousAddress()
-        self.current_address_val = IdabridgeUtils.guess_name(addr, regs=self.regs)
-        self.current_address = IdabridgeUtils.guess_name(self.current_address_val)
-        
-        if idc.Jump(self.current_address_val):
-            idc.SetColor(self.current_address_val, idc.CIC_ITEM, 0xffa0a0)
-            return True
+        self.current_address_str = IdabridgeUtils.guess_name(addr, regs=self.regs)
+        self.current_address_val = IdabridgeUtils.guess_name(self.current_address_str)
+        result = False
+        try:
+            result = idc.Jump(self.current_address_val)
+            if result:
+                idc.SetColor(self.current_address_val, idc.CIC_ITEM, 0xffa0a0)
+                return result
+        except:
+            # might ask to load a file here?
+            pass
         return False
     
     def getPreviousAddress(self):
-        return (self.previous_address, self.previous_address_val)
+        return (self.previous_address_val, self.previous_address_str)
 
         
     def getCurrentAddress(self):
-        return (self.current_address, self.current_address_val)
+        return (self.current_address_val, self.current_address_str)
     
     def platformGetRegisterNames(self):
         return self.reg.keys()
 
     def platformAddMemoryBlock(self, addr, data, id=0, **kargs):
-        mb = MemoryBlock(addr, data=data, regs=self.regs, **kargs)
+        appname = IdabridgeUtils.guess_addr_by_name_expression(string.strip(), **kargs)
+        kargs['appname'] = appname
+        mb = MemoryBlock(addr, data=data, **kargs)
         self.memory_blocks.insert(id, mb)
         
     def platformRemoveMemoryBlock(self, id):
@@ -138,20 +146,25 @@ class Idabridge:
             return None
         return self.memory_blocks[id]
     
-    def platformGetRegisters(self, id=0):
-        if id > 0:
+    def platformUpdateRegisters(self, regs):
+        self.regs = regs
+        for k,v in regs.items():
+            self.regs[k] = v
+        
+    def platformGetRegisters(self, id=None):
+        if not id is None:
             return self.reg_history[id]
         return self.regs
-    
+        
     def platformSetRegisters(self, regs):
         kargs = {'time':time()}
         self.regs = Registers(**kargs)
         for k,v in regs.items():
             self.regs[k] = v
-        self.reg_history.insert(0, regs)
+        
     
     def platformSaveRegisters(self):
-        pass
+        self.reg_history.insert(0, self.regs)
     
         
     def register_cmd(self, handler):
@@ -177,7 +190,7 @@ class Idabridge:
         if not cmd_type in set([CMD_REQ, CMD_RES]):
             kargs['reason'] = "Invalid command type."
             # calling command directly
-            result = self.handler['fail'](CMD_CLI, None, **kargs)
+            result = self.handlers['fail'](CMD_CLI, None, **kargs)
         else:
             result = self.execute_cmd(cmd_type, cmd_name, buffer, **kargs)
         return str(result)
@@ -203,7 +216,7 @@ class Idabridge:
         if cmd_name is None:
             kargs['reason'] = "Command name was None."
             # calling command directly
-            return self.handler['fail'](CMD_CLI, None, **kargs)
+            return self.handlers['fail'](CMD_CLI, None, **kargs)
         if (cmd_name != "pycmd") and\
             ((cmd_name in self.aliases and self.aliases[cmd_name] in self.pycmds) or\
             (not cmd_name in self.aliases and not cmd_name in self.pycmds)):
@@ -229,7 +242,9 @@ class Idabridge:
         if cmd_name in self.aliases:
             cmd_name = self.aliases[cmd_name]
         
+        print "Final cmd_name: %s cmd_type: %d"%(cmd_name, cmd_type)
         handler = self.handlers[cmd_name]
+        
         return handler.handle(cmd_type, data, **kargs)
         
     def platformGetImageBaseAddress(self):
@@ -262,9 +277,11 @@ class Idabridge:
         return result
 
     def platformAddBreakpoint(self, bp):
+        idc.Message("In platform add breakpoint.  Attempting to add the following bps: %s\n"%(str(bp)))
         if not IdabridgeUtils.convert_str_to_numval(bp) is None:
+            idc.Message("could not convert the bp to a numval.\n")
             return self.platformAddBreakpointByAddr(IdabridgeUtils.convert_str_to_numval(bp))
-        return platformAddBreakpointByName(bp)
+        return self.platformAddBreakpointByName(bp)
     
     def platformAddBreakpointByAddr(self, bp):
         if bp is None:
@@ -368,11 +385,11 @@ class IdabridgeC(idacomms.IDAC, Idabridge):
         self.stop_listener()
     
     def setCurrentAddress(self, addr):
-        self.previous_address = idc.Name(self.current_address)
+        self.previous_address_val = idc.Name(self.current_address_val)
         if isinstance(addr, int) or isinstance(addr, long):
-            self.current_address = idc.Name(addr)
+            self.current_address_val = idc.Name(addr)
         else:
-            self.current_address = "0x%08x"%addr
+            self.current_address_val = "0x%08x"%addr
         
         if idc.Jump(addr):
             idc.SetColor(addr, idc.CIC_ITEM, 0xffa0a0)
@@ -383,7 +400,7 @@ class IdabridgeC(idacomms.IDAC, Idabridge):
     def getCurrentAddress(self, addr):
         x = convert_str_to_numval(addr)
         if x is None:
-            return LocByName(self.current_address)
+            return LocByName(self.current_address_val)
         return x
     
     

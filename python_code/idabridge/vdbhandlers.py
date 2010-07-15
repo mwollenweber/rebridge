@@ -195,13 +195,14 @@ class breakc(Handler):
         #print "If you are here, chances are you are another thread in the matrix."
         #if "trace" in kargs:
         #    self.parent.trace = kargs['trace']
-        self.parent.platformSaveRegisters()    
+        kargs = {}
+        self.parent.platformUpdateRegisters(**kargs)    
         if not self.requirements():
             #print "but you forgot to follow the white rabbit, goto sleep:"
             return False
         #print "And the moment of trut"
         # update registers and append to register history, nyuk, nyuk
-        self.parent.platformSaveRegisters()
+        #self.parent.platformSaveRegisters()
         pc = self.parent.platformGetPC()
         buffer = self.create_base_buffer(CMD_RES, "break")
         buffer.write_string("0x%08x"%(pc))
@@ -330,11 +331,13 @@ class getregs(Handler):
         return self.parent.send(buffer)
                 
     def req(self, buffer, **kargs):
+        #self.parent.platformSaveRegisters()
         regs = self.parent.platformGetRegisters()
         regs_str = ""
         if not regs is None:
             regs_str = ",".join(["%s:0x%08x"%(reg,regs[reg]) for reg in regs])
-        buffer = self.create_base_buffer(CMD_RSP, "getregs")
+        #print regs_str
+        buffer = self.create_base_buffer(CMD_REQ, "setregs")
         buffer.write_string(regs_str)
         return self.parent.send(buffer)
             
@@ -350,22 +353,7 @@ class getregs(Handler):
         self.parent.platformSetRegisters(regs)
         return True
         
-# TODO:Copied from idahandlers fixme  
-class setbps(Handler):
-    
-    def cli(self, string, **kargs):
-        buffer = self.create_base_buffer(CMD_REQ, "setbps")
-        bp_str = ",".join([bp.getAddress() for i in self.parent.getBreakpoints()])
-        buffer.write_string(bp_str)
-        return self.parent.send(buffer)
-        
-    def req(self, buffer, **kargs):
-        breakpoints = buffer.read_string()
-        bp_list = [bp for i in breakpoints.split(',')]
-        self.parent.removeAllBreakpoints()
-        for bp in bp_list:
-            self.parent.addBreakpointByAddr(bp)
-        return True
+
 
 # TODO: Not tested.          
 class getbps(Handler):
@@ -381,9 +369,10 @@ class getbps(Handler):
         
     def req(self, buffer, **kargs):
         bp_str = ",".join(self.parent.platformGetBreakpoints())
-        buffer = self.create_base_buffer(CMD_REQ, "setbps")
-        buffer.write_string(bp_str)
-        return self.parent.send(buffer)
+        print "Sending a setbps REQ"
+        buf = self.create_base_buffer(CMD_REQ, "setbps")
+        buf.write_string(bp_str)
+        return self.parent.send(buf)
             
 
 # TODO: Not tested.       
@@ -411,97 +400,109 @@ class setbps(Handler):
             bpaddr = bp.split(":")[0]
             if len(bp.split(":")) > 1:
                 kargs['idaname'] = bp.split(":")[1]
-            self.parent.addBreakpointByAddr(bp.split(":")[0], **kargs)
+            self.parent.platformAddBreakpoint(bp.split(":")[0], **kargs)
         return True
 
 class writemem(Handler):
     def __post_init__(self):
-        self.aliases = ['writemem','write_mem']
+        self.aliases = ['writemem','write_mem','wm']
         #print self.aliases
         self.parent.add_aliases(self.cmd_name, self.aliases)
         
     def cli(self, string):
-        buffer = self.create_base_buffer(CMD_REQ, "writemem")
+        buffer = self.create_base_buffer(CMD_REQ)
         buffer_args = ""
-        toHex = lambda x:"".join([hex(ord(c))[2:].zfill(2) for c in x])
+        if len(string.split(" ")) < 2:
+            idc.Message("writemem: <addr> <string>, ex: wm _main \\x90\\x90AAAA\n or wm _main '''1010'''*8\n")
+            return False
         
+        addr = string.split(" ")[0]
+        kargs = {'trace':self.parent.trace}
+        addr_val = VdbbridgeUtils.guess_addr_by_name_expression(addr, **kargs)
+        
+        data = " ".join(string.split(" ")[1:])
+        # if the byte is '''<string>''' * <repeat>
+        if data.find('\'\'\'') == 0 and \
+            data.find('\'\'\'',3) > 3 and \
+            data.find("*", data.find('\'\'\'',3)) > data.find('\'\'\'',3):
+            data = self.parent.trace.parseExpression(data)
         #do any pre-processing on the args
-        print "in writemem.cli got str=%s\n" % string
-        string = string.strip()
-        args = string.split(' ')
-        
-        try:
-            if str(args[0]).isalnum() == True:     
-                int(args[0], 16)
-                buffer_args += args[0] + ","
-                args[1] = args[1].strip()
-                args[1] = args[1].strip('"')
-                buffer_args += toHex(args[1]) +","
-                print "out = %s\n" % buffer_args
-            else:
-                raise
-        except:
-            #else also consider passed an integer
-            #else also consider passed a variable
-            print "fuxk\n"
-            exceptionType, exceptionValue, exceptionTraceback = sys.exc_info()
-            traceback.print_exception(exceptionType, exceptionValue, exceptionTraceback, limit=2, file=sys.stdout)
-            return self.return_data(False)
-        
-        buffer.write_string(buffer_args)
         buffer.write_string("0x%08x"%addr_val)
-        return self.return_data(buffer)
+        buffer.write_string(data)
+        return self.parent.send(buffer)
         
     def req(self, buffer):
         print "got a writemem req\n"
+        # Byte ea,
         print "buffer str = %s" % buffer.read_string()
-        return self.return_data(True)
+        return True
 
     def rsp(self, buffer):
-        print "writemem.rsp " + buffer.read_string()
-        return self.return_data(True)
+        return True
     
 class readmem(Handler):
     def __post_init__(self):
-        self.aliases = ['readmem','read_mem']
+        self.aliases = ['readmem','read_mem','rem']
         #print self.aliases
         self.parent.add_aliases(self.cmd_name, self.aliases)
     
     def cli(self, string):
         #do any pre-processing on the args
-        buffer_args = ""
+        if len(string.strip()) == 0:
+            return False
+        cnt = '1'
+        addr = string.strip().split()[0]
+        if len(string.strip().split()) > 1 and cnt.isdigit():
+            cnt = string.strip().split()[1]
+        kargs = {'trace':self.parent.trace}
+        addr_val = VdbbridgeUtils.guess_addr_by_name_expression(addr, **kargs)
+        buffer = self.create_base_buffer(CMD_REQ)
         
-        print "in writemem.cli got str=%s\n" % string
-        string = string.strip()
-        args = string.split(' ')
+        if addr_val != BADADDR:
+            addr = "0x%08x"%addr_val
         
-        try:
-            if len(args) == 2 and str(args[0]).isalnum() and str(args[1]).isalnum():
-                int(args[0], 16)
-                int(args[1], 10)
-                buffer_args += args[0] + ","
-                buffer_args += args[1] +","
-                
-            elif len(args) == 1 and str(args[0]).isalnum():
-                int(args[0], 16)
-                buffer_args += args[0] + ","
-                buffer_args += "4," #default to a dword read
-                
-            else:
-                return self.return_data(False)
-        except:
-            print "ERROR: unable to process readmem\n"
-            return self.return_data(False)
-        
-        buffer = self.create_base_buffer(CMD_REQ, "readmem")
-        buffer.write_string(buffer_args)
-        return self.return_data(buffer)
+        buffer.write_string(addr)
+        buffer.write_string(cnt)
+        return self.parent.send(buffer)
         
     def req(self, buffer):
-        print "got a read_mem req\n"
-        print "buffer str = %s" % buffer.read_string()
-        return self.return_data(True)
+        addr = buffer.read_string()
+        cnt = buffer.read_string()
+        kargs = {'regs':self.parent.platformGetRegisters()}
+        result = "error bad values"
+        buffer = self.create_base_buffer(CMD_RES)
+        
+        kargs = {'trace':self.parent.trace}
+        addr_val = VdbbridgeUtils.guess_addr_by_name_expression(addr.strip(), **kargs)
+        
+        if addr_val is None or addr_val == BADADDR:
+            buffer.write_string(addr)
+            buffer.write_string(result)
+            return self.parent.send(buffer)
+        cnt = VdbbridgeUtils.convert_str_to_numval(cnt)
+        if cnt is None:
+            cnt = 1
+        result = []
+        for i in xrange(0,cnt):
+            result.append(chr(idc.Byte(addr_val+i)))
+        result = "".join(result)
+        t = "%f"%time.time()
+        buffer.write_string(addr)
+        buffer.write_string(result)
+        buffer.write_string(t)
+        return self.parent.send(buffer)
 
     def rsp(self, buffer):
-        print "readmem.rsp: " + buffer.read_string()
-        return self.return_data(True)
+        kargs = {}
+        addr = buffer.read_string()
+        data = buffer.read_string()
+        t = buffer.read_string()
+        if addr is None:
+            return False
+        if data is None:
+            return False
+        if not t is None:
+            kargs['time'] = t
+        
+        self.platformAddMemoryBlock(addr, data, **kargs)
+        return True
