@@ -392,7 +392,8 @@ class setbps(Handler):
     def req(self, buffer, **kargs):
         breakpoints = buffer.read_string()
         bp_list = [bp for bp in breakpoints.split(',')]
-        self.parent.platformClearBreakpoints()
+        #self.parent.platformClearBreakpoints()
+        #self.parent.platformClearBreakpoints()
         # ignore the names provided by the debugger at the moment
         kargs = {'idaname':""}
         for bp in bp_list:

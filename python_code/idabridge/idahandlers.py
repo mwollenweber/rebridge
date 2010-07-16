@@ -424,7 +424,7 @@ class setbps(Handler):
         idc.Message("Handling a setbps REQ.\n")
         breakpoints = buffer.read_string()
         bp_list = [bp for bp in breakpoints.split(',')]
-        self.parent.platformClearBreakpoints()
+        #self.parent.platformClearBreakpoints()
         # ignore the names provided by the debugger at the moment
         for bp in bp_list:
             if bp.strip() == "":
