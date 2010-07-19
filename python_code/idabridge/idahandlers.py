@@ -75,6 +75,7 @@ class rebase(Handler):
         current_ea = idc.ScreenEA()
         c_base_addr = idc.FirstSeg()
         r_base_diff = rebase_to_addr - c_base_addr
+        idc.Message("instanceof(rebase_to_addr, str) == %s rebase_to_addr: %s Got: %s)"%(isinstance(rebase_to_addr, str), rebase_to_addr, addr))
         idaapi.rebase_program(r_base_diff, idc.MSF_FIXONCE)
         idc.AnalyseArea(idc.MinEA(),idc.MaxEA())
         new_ea = rebase_to_addr + ( current_ea - c_base_addr)
@@ -354,10 +355,12 @@ class readmem(Handler):
         addr_val = IdabridgeUtils.guess_addr_by_name_expression(addr.strip(), **kargs)
         
         if addr_val is None or addr_val > idc.MaxEA() or addr_val < idc.MinEA():
-            
             buffer.write_string(addr)
             buffer.write_string(result)
             return self.return_data(buffer)
+        else:
+            addr = "0x%08x"%addr_val
+            
         cnt = IdabridgeUtils.convert_str_to_numval(cnt)
         if cnt is None:
             cnt = 1
@@ -366,6 +369,7 @@ class readmem(Handler):
             result.append(chr(idc.Byte(addr_val+i)))
         result = "".join(result)
         t = "%f"%time.time()
+        
         buffer.write_string(addr)
         buffer.write_string(result)
         buffer.write_string(t)

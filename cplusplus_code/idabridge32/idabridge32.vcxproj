@@ -14,7 +14,7 @@
     <ProjectGuid>{6D016718-3440-4821-A951-97BD1BFDD145}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>ida_client</RootNamespace>
-    <ProjectName>idabridge32</ProjectName>
+    <ProjectName>idabridge</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -103,7 +103,6 @@
   <ItemGroup>
     <ClInclude Include="..\sources\buffer.h" />
     <ClInclude Include="..\sources\cmd_translation.h" />
-    <ClInclude Include="..\sources\BaseCommand.h" />
     <ClInclude Include="..\sources\dlistener_ida.h" />
     <ClInclude Include="..\sources\dlistener_net.h" />
     <ClInclude Include="..\sources\idanet.hpp" />
@@ -112,10 +111,8 @@
     <ClInclude Include="..\sources\sdk_versions.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\sources\Argument.cpp" />
     <ClCompile Include="..\sources\buffer.cpp" />
     <ClCompile Include="..\sources\cmd_translation.cpp" />
-    <ClCompile Include="..\sources\BaseCommand.cpp" />
     <ClCompile Include="..\sources\dlistener_ida.cpp" />
     <ClCompile Include="..\sources\dlistener_net.cpp" />
     <ClCompile Include="..\sources\idanet.cpp" />

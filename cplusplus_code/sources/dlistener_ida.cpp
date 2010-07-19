@@ -24,12 +24,13 @@
 //#include "dlistener_ui.h"
 #include <cstdio>
 
-#define LAST_SERVER_SUPVAL 2
-#define LAST_PORT_ALTVAL 2
+
 #define DLISTENER_NETNODE "$ DLISTENER NETNODE"
+unsigned int LAST_SERVER_SUPVAL = 2;
+unsigned int LAST_PORT_ALTVAL = 2;
+
 volatile HWND mainWindow;
 volatile HMODULE hModule;
-
 
 
 // taken from collabreate
@@ -39,7 +40,11 @@ IDAPYTHON_FREE	 IDAPython_destroy_object = NULL;
 
 #define log msg
 #define PLUGIN_NAME "idabridge"
+
+#ifndef __EA64__
 netnode cnn(DLISTENER_NETNODE, 0, true);
+#endif
+
 static Dispatcher tempDispatcher;
 
 
@@ -292,12 +297,16 @@ int idaapi init(void) {
 
 	  if(!hModule)
 	  {
-		  log("hmodule is fucked\n");
+		  log("hmodule is fscked\n");
 		  return -1;
 	  }
 
 	  init_command_handlers();
+#ifdef IDA64
+	  IDAPythonHModule = GetModuleHandle("python.p64");
+#else
 	  IDAPythonHModule = GetModuleHandle("python.plw");
+#endif
 	  IDAPython_run_string = (IDAPYTHON_FN)GetProcAddress(IDAPythonHModule,"IDAPython_run_string");
 	  IDAPython_eval_string = (IDAPYTHON_FN)GetProcAddress(IDAPythonHModule,"IDAPython_eval_string");
 	  IDAPython_destroy_object = (IDAPYTHON_FREE)GetProcAddress(IDAPythonHModule,"IDAPython_destroy_object");
@@ -446,8 +455,11 @@ bool start_cli(std::string &args){
 	std::string default_host = "127.0.0.1",
 			    default_port = "8088";
 	char host_c[8096] = {"127.0.0.1\0"};
+	short port = 8088;
+#ifndef __EA64__
 	cnn.supstr(LAST_SERVER_SUPVAL, host_c, sizeof(host_c));
-	short port = cnn.altval(LAST_PORT_ALTVAL);
+	port = cnn.altval(LAST_PORT_ALTVAL);
+#endif
 
 	/*if (strnlen(host_c, 8096) == 0){
 		strncpy(host_c, default_host.c_str(), default_host.size())
@@ -481,8 +493,10 @@ bool start_cli(std::string &args){
 	}
 	if (createSocketWindow(conn, msg_dispatcher)) {
 		log(PLUGIN_NAME": successfully connected to %s:%d\n", host.c_str(), port);
+#ifndef __EA64__
 		cnn.altset(LAST_PORT_ALTVAL, port);
 		cnn.supset(LAST_SERVER_SUPVAL, host.c_str());
+#endif
 	}
 	if (is_connected()){
 		std::string rebase = "rebase",

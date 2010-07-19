@@ -4,9 +4,10 @@ from basehandler import *
 from idapython_aliases import *
 from idabridgeutils import *
 from time import *
+from bridgecomms import *
 
 try:
-    import idacomms
+    import bridgecomms
 except:
     print "If you are having socket issues, make sure you're PATH includes PythonXX\DLLS"
     raise
@@ -359,7 +360,7 @@ class Idabridge:
         return False
         
 # has the client thread built into it
-class IdabridgeC(idacomms.IDAC, Idabridge):
+class IdabridgeC(bridgecomms.IDAC, Idabridge):
     def __init__(self):
         idarserver.IDAC.__init__(self)
         idabridge.__init__(self)

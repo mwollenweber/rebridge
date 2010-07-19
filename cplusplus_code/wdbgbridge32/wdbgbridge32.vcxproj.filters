@@ -7,19 +7,19 @@
     <ClCompile Include="..\sources\cmd_translation.cpp">
       <Filter>Sources</Filter>
     </ClCompile>
-    <ClCompile Include="..\sources\dlistener_ida.cpp">
+    <ClCompile Include="..\sources\dlistener.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\sources\dlistener_eventcb.cpp">
       <Filter>Sources</Filter>
     </ClCompile>
     <ClCompile Include="..\sources\dlistener_net.cpp">
       <Filter>Sources</Filter>
     </ClCompile>
-    <ClCompile Include="..\sources\idanet.cpp">
+    <ClCompile Include="..\sources\dlistener_wdbg.cpp">
       <Filter>Sources</Filter>
     </ClCompile>
-    <ClCompile Include="..\sources\BaseCommand.cpp">
-      <Filter>Sources</Filter>
-    </ClCompile>
-    <ClCompile Include="..\sources\Argument.cpp">
+    <ClCompile Include="..\sources\dlistener_windbg.cpp">
       <Filter>Sources</Filter>
     </ClCompile>
   </ItemGroup>
@@ -30,34 +30,31 @@
     <ClInclude Include="..\sources\cmd_translation.h">
       <Filter>Headers</Filter>
     </ClInclude>
-    <ClInclude Include="..\sources\dlistener_ida.h">
+    <ClInclude Include="..\sources\dlistener.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\sources\dlistener_eventcb.h">
       <Filter>Headers</Filter>
     </ClInclude>
     <ClInclude Include="..\sources\dlistener_net.h">
       <Filter>Headers</Filter>
     </ClInclude>
-    <ClInclude Include="..\sources\idanet.hpp">
+    <ClInclude Include="..\sources\dlistener_wdbg.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\sources\dlistener_windbg.h">
       <Filter>Headers</Filter>
     </ClInclude>
     <ClInclude Include="..\sources\idapython_aliases.h">
       <Filter>Headers</Filter>
     </ClInclude>
-    <ClInclude Include="..\sources\resource.h">
-      <Filter>Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="..\sources\sdk_versions.h">
-      <Filter>Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="..\sources\BaseCommand.h">
-      <Filter>Headers</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <Filter Include="Headers">
-      <UniqueIdentifier>{20608f2e-5f72-4341-a164-9dec0bf404e8}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Sources">
-      <UniqueIdentifier>{2aa2b169-8c97-46ee-b1c6-f53ad6359e77}</UniqueIdentifier>
+      <UniqueIdentifier>{22684802-1991-49da-9d16-3094f9e5e201}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headers">
+      <UniqueIdentifier>{c1cafe2a-99a2-4f40-8dbe-9dc4706366bd}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

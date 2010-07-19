@@ -7,6 +7,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "wdbgbridge32", "wdbgbridge3
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "wdbgbridge64", "wdbgbridge64\wdbgbridge64.vcxproj", "{2C34CE16-4BC3-41E1-9562-679EC657F042}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "idabridge64", "idabridge64\idabridge64.vcxproj", "{B0FF4081-1554-4B9A-806F-72822275022D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -35,6 +37,12 @@ Global
 		{2C34CE16-4BC3-41E1-9562-679EC657F042}.Release|Win32.Build.0 = Release|Win32
 		{2C34CE16-4BC3-41E1-9562-679EC657F042}.Release|X64.ActiveCfg = Release|X64
 		{2C34CE16-4BC3-41E1-9562-679EC657F042}.Release|X64.Build.0 = Release|X64
+		{B0FF4081-1554-4B9A-806F-72822275022D}.Debug|Win32.ActiveCfg = Debug|Win32
+		{B0FF4081-1554-4B9A-806F-72822275022D}.Debug|Win32.Build.0 = Debug|Win32
+		{B0FF4081-1554-4B9A-806F-72822275022D}.Debug|X64.ActiveCfg = Debug|x64
+		{B0FF4081-1554-4B9A-806F-72822275022D}.Release|Win32.ActiveCfg = Release|Win32
+		{B0FF4081-1554-4B9A-806F-72822275022D}.Release|Win32.Build.0 = Release|Win32
+		{B0FF4081-1554-4B9A-806F-72822275022D}.Release|X64.ActiveCfg = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

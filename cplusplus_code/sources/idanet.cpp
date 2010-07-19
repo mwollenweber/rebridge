@@ -34,7 +34,7 @@
 #if IDA_SDK_VERSION < 500
 #include <fpro.h>
 #endif
-
+#define GWL_WNDPROC -4
 
 #define SOCKET_MSG WM_USER
 #define PLUGIN_NAME "network_listener"

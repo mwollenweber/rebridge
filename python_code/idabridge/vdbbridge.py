@@ -3,13 +3,13 @@ from buffer import *
 from socket import socket
 from socket import timeout
 from threading import Thread
-import idacomms
+import bridgecomms
 from vdbhandlers import *
 from idapython_aliases import *
 import envi.cli as e_cli
 import PE
 from vdbbridgeutils import *
-
+import time
 sys.path.append("vdb/")
 import vdb
 
@@ -31,14 +31,24 @@ def init_vdbbridge_cmds(vdbbridge):
     getregs(**vdbbridge_vals)
     
     # need to test these
-    #writemem(**vdbbridge_vals)
-    #readmem(**vdbbridge_vals)
+    writemem(**vdbbridge_vals)
+    readmem(**vdbbridge_vals)
 
+class MemoryBlock(object):
+    def __init__(self, addr, **kargs):
+        object.__init__(self)
+        self.time = kargs.get("time", time.time())
+        self.addr = addr
+        self.data = kargs.get("data","")
+        self.name = kargs.get("name","")
+        self.appname = kargs.get("appname","")
+    
+    def __str__(self):
+        return "%s:%s %s"%(self.addr, self.name, repr(self.data))
 
-
-class Vdbbridge(vdb.Vdb, idacomms.IDARS):
+class Vdbbridge(vdb.Vdb, bridgecomms.IDARS):
     def __init__(self, trace):
-        idacomms.IDARS.__init__(self)
+        bridgecomms.IDARS.__init__(self)
         vdb.Vdb.__init__(self,trace=None)
         self.handlers = {}
         self.pycmds = {}
@@ -52,6 +62,7 @@ class Vdbbridge(vdb.Vdb, idacomms.IDARS):
         #self.tid_to_handle = 0xFFFFFFFF
         self.handle_remote_cmd = False
         self.remote_cmd_lock = threading.Lock()
+        self.memory_blocks = []
         
         # add commands here
         d = {'parent':self}
@@ -145,7 +156,7 @@ class Vdbbridge(vdb.Vdb, idacomms.IDARS):
         self.regs = regs
         for k,v in regs.items():
             self.regs[k] = v
-
+    
     
     def platformSetRegisters(self, regs):
         self.regs = regs
@@ -411,10 +422,9 @@ class Vdbbridge(vdb.Vdb, idacomms.IDARS):
     
     def platformAddMemoryBlock(self, addr, data, id=0, **kargs):
         kargs['trace'] = self.trace
-        addr_val = VdbbridgeUtils.guess_addr_val(addr)
-        appname = VdbbridgeUtils.guess_addr_by_name_expression(addr_val, **kargs)
-        
-        mb = MemoryBlock(addr_val, data=data, regs=self.regs, **kargs)
+        kargs['regs']=self.regs
+        addr_val = VdbbridgeUtils.guess_addr_by_name_expression(addr, **kargs)
+        mb = MemoryBlock(addr_val, data=data, **kargs)
         self.memory_blocks.insert(id, mb)
         
     def platformRemoveMemoryBlock(self, id):

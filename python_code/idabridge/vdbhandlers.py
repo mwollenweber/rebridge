@@ -8,7 +8,7 @@ import traceback
 
 
 #from aliases import *
-
+from vdbbridgeutils import *
 from idapython_aliases import *
 
 # this will break how i handle commands
@@ -498,6 +498,7 @@ class readmem(Handler):
         addr = buffer.read_string()
         data = buffer.read_string()
         t = buffer.read_string()
+        print "time: %s addr: %s data: %s"%(t,addr,data)
         if addr is None:
             return False
         if data is None:
@@ -505,5 +506,5 @@ class readmem(Handler):
         if not t is None:
             kargs['time'] = t
         
-        self.platformAddMemoryBlock(addr, data, **kargs)
+        self.parent.platformAddMemoryBlock(addr, data, **kargs)
         return True
