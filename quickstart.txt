@@ -38,4 +38,4 @@ be aliases.
 Code is a mess, but everything is flushed out to the point where future
 development can be made into a more formal OO solution.
 
-hopefully this will be a good start
+hopefully this will be a good start... hopefully
